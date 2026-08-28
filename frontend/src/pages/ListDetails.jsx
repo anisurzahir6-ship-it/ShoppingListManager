@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
+import API_URL from "../api";
 
 function ListDetails() {
   const { id } = useParams();
@@ -13,7 +14,7 @@ function ListDetails() {
   const fetchItems = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/lists/${id}/items`,
+        `${API_URL}/api/lists/${id}/items`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -23,7 +24,10 @@ function ListDetails() {
 
       setItems(response.data);
     } catch (error) {
-      console.error("Failed to fetch items:", error);
+      console.error(
+        "Failed to fetch items:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -42,34 +46,47 @@ function ListDetails() {
     <div>
       <h1>Shopping List Items</h1>
 
-      <Link to="/dashboard">← Back to Dashboard</Link>
+      <Link to="/dashboard">
+        ← Back to Dashboard
+      </Link>
 
       <hr />
 
       {loading ? (
         <p>Loading items...</p>
       ) : items.length === 0 ? (
-        <p>No items in this shopping list.</p>
+        <p>
+          No items in this shopping list.
+        </p>
       ) : (
         <div>
           {items.map((item) => (
             <div key={item._id}>
-              <h3>{item.name}</h3>
+
+              <h3>
+                {item.name}
+              </h3>
 
               <p>
-                Quantity: {item.quantity} {item.unit}
+                Quantity:{" "}
+                {item.quantity}{" "}
+                {item.unit}
               </p>
 
               <p>
-                Category: {item.category}
+                Category:{" "}
+                {item.category}
               </p>
 
               <p>
                 Purchased:{" "}
-                {item.purchased ? "Yes" : "No"}
+                {item.purchased
+                  ? "Yes"
+                  : "No"}
               </p>
 
               <hr />
+
             </div>
           ))}
         </div>

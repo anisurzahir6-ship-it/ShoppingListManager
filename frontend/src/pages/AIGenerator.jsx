@@ -3,6 +3,7 @@ import "./AIGenerator.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../api";
 
 function AIGenerator() {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ function AIGenerator() {
   const fetchLists = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/lists",
+        `${API_URL}/api/lists`,
         authHeaders
       );
 
@@ -41,10 +42,15 @@ function AIGenerator() {
       setLists(fetchedLists);
 
       if (fetchedLists.length > 0) {
-        setSelectedListId(fetchedLists[0]._id);
+        setSelectedListId(
+          fetchedLists[0]._id
+        );
       }
     } catch (error) {
-      console.error("Failed to fetch shopping lists:", error);
+      console.error(
+        "Failed to fetch shopping lists:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -81,7 +87,7 @@ function AIGenerator() {
       setItems([]);
 
       const response = await axios.post(
-        "http://localhost:5000/api/ai/generate-list",
+        `${API_URL}/api/ai/generate-list`,
         {
           mealPlan,
         },
@@ -89,15 +95,21 @@ function AIGenerator() {
       );
 
       const generatedItems =
-        response.data.shoppingList?.items || [];
+        response.data.shoppingList?.items ||
+        [];
 
       setItems(generatedItems);
 
       if (generatedItems.length === 0) {
-        alert("AI did not generate any shopping items.");
+        alert(
+          "AI did not generate any shopping items."
+        );
       }
     } catch (error) {
-      console.error("AI generation failed:", error);
+      console.error(
+        "AI generation failed:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -115,7 +127,8 @@ function AIGenerator() {
   const removeItem = (indexToRemove) => {
     setItems((currentItems) =>
       currentItems.filter(
-        (_, index) => index !== indexToRemove
+        (_, index) =>
+          index !== indexToRemove
       )
     );
   };
@@ -124,21 +137,27 @@ function AIGenerator() {
   // UPDATE GENERATED ITEM
   // ==========================================
 
-  const updateItem = (index, field, value) => {
+  const updateItem = (
+    index,
+    field,
+    value
+  ) => {
     setItems((currentItems) =>
-      currentItems.map((item, itemIndex) => {
-        if (itemIndex !== index) {
-          return item;
-        }
+      currentItems.map(
+        (item, itemIndex) => {
+          if (itemIndex !== index) {
+            return item;
+          }
 
-        return {
-          ...item,
-          [field]:
-            field === "quantity"
-              ? Number(value)
-              : value,
-        };
-      })
+          return {
+            ...item,
+            [field]:
+              field === "quantity"
+                ? Number(value)
+                : value,
+          };
+        }
+      )
     );
   };
 
@@ -146,14 +165,21 @@ function AIGenerator() {
   // ADD SINGLE ITEM TO SHOPPING LIST
   // ==========================================
 
-  const addSingleItemToList = async (item, index) => {
+  const addSingleItemToList = async (
+    item,
+    index
+  ) => {
     if (!selectedListId) {
-      alert("Please select a shopping list first.");
+      alert(
+        "Please select a shopping list first."
+      );
       return;
     }
 
     if (!item.name?.trim()) {
-      alert("Item name cannot be empty.");
+      alert(
+        "Item name cannot be empty."
+      );
       return;
     }
 
@@ -161,7 +187,7 @@ function AIGenerator() {
       setAddingIndex(index);
 
       await axios.post(
-        `http://localhost:5000/api/lists/${selectedListId}/items`,
+        `${API_URL}/api/lists/${selectedListId}/items`,
         {
           name: item.name,
           quantity: Number(item.quantity),
@@ -171,12 +197,14 @@ function AIGenerator() {
         authHeaders
       );
 
-      alert(`${item.name} added to your shopping list!`);
+      alert(
+        `${item.name} added to your shopping list!`
+      );
 
-      // Remove item from generated list after adding
       setItems((currentItems) =>
         currentItems.filter(
-          (_, itemIndex) => itemIndex !== index
+          (_, itemIndex) =>
+            itemIndex !== index
         )
       );
     } catch (error) {
@@ -195,17 +223,21 @@ function AIGenerator() {
   };
 
   // ==========================================
-  // ADD ALL AI ITEMS TO SELECTED SHOPPING LIST
+  // ADD ALL AI ITEMS
   // ==========================================
 
   const addItemsToList = async () => {
     if (!selectedListId) {
-      alert("Please select a shopping list.");
+      alert(
+        "Please select a shopping list."
+      );
       return;
     }
 
     if (items.length === 0) {
-      alert("There are no items to add.");
+      alert(
+        "There are no items to add."
+      );
       return;
     }
 
@@ -214,7 +246,7 @@ function AIGenerator() {
 
       for (const item of items) {
         await axios.post(
-          `http://localhost:5000/api/lists/${selectedListId}/items`,
+          `${API_URL}/api/lists/${selectedListId}/items`,
           {
             name: item.name,
             quantity: Number(item.quantity),
@@ -277,7 +309,9 @@ function AIGenerator() {
       ====================================== */}
 
       <div className="ai-header">
+
         <div>
+
           <p className="ai-eyebrow">
             SMART SHOPPING
           </p>
@@ -290,6 +324,7 @@ function AIGenerator() {
             Turn your meal plan into a practical
             grocery list in seconds.
           </p>
+
         </div>
 
         <button
@@ -300,6 +335,7 @@ function AIGenerator() {
         >
           ← Back to Dashboard
         </button>
+
       </div>
 
       {/* ======================================
@@ -309,7 +345,9 @@ function AIGenerator() {
       <div className="ai-input-section">
 
         <div className="ai-section-heading">
+
           <div>
+
             <p className="ai-eyebrow">
               STEP 1
             </p>
@@ -317,7 +355,9 @@ function AIGenerator() {
             <h2>
               Enter Your Meal Plan
             </h2>
+
           </div>
+
         </div>
 
         <form onSubmit={generateList}>
@@ -347,7 +387,9 @@ function AIGenerator() {
               <button
                 className="ai-clear-button"
                 type="button"
-                onClick={clearGeneratedList}
+                onClick={
+                  clearGeneratedList
+                }
               >
                 Clear
               </button>
@@ -356,6 +398,7 @@ function AIGenerator() {
           </div>
 
         </form>
+
       </div>
 
       {/* ======================================
@@ -367,6 +410,7 @@ function AIGenerator() {
         <div className="ai-results-header">
 
           <div>
+
             <p className="ai-eyebrow">
               STEP 2
             </p>
@@ -374,6 +418,7 @@ function AIGenerator() {
             <h2>
               Generated Shopping List
             </h2>
+
           </div>
 
           {items.length > 0 && (
@@ -390,6 +435,7 @@ function AIGenerator() {
         {loading ? (
 
           <div className="ai-empty">
+
             <div className="ai-loading-icon">
               ✨
             </div>
@@ -402,6 +448,7 @@ function AIGenerator() {
               AI is analyzing your meal plan
               and selecting practical groceries.
             </p>
+
           </div>
 
         ) : items.length === 0 ? (
@@ -499,6 +546,7 @@ function AIGenerator() {
                     )
                   }
                 >
+
                   <option value="piece">
                     Piece
                   </option>
@@ -534,6 +582,7 @@ function AIGenerator() {
                   <option value="can">
                     Can
                   </option>
+
                 </select>
 
                 {/* CATEGORY */}
@@ -552,6 +601,7 @@ function AIGenerator() {
                     )
                   }
                 >
+
                   <option value="Other">
                     Other
                   </option>
@@ -591,6 +641,7 @@ function AIGenerator() {
                   <option value="Canned goods">
                     Canned goods
                   </option>
+
                 </select>
 
                 {/* ACTIONS */}
@@ -653,6 +704,7 @@ function AIGenerator() {
           <div className="ai-section-heading">
 
             <div>
+
               <p className="ai-eyebrow">
                 STEP 3
               </p>
@@ -665,6 +717,7 @@ function AIGenerator() {
                 Choose where you want to save
                 these generated items.
               </p>
+
             </div>
 
           </div>
@@ -672,9 +725,11 @@ function AIGenerator() {
           {loadingLists ? (
 
             <div className="ai-empty">
+
               <p>
                 Loading your shopping lists...
               </p>
+
             </div>
 
           ) : lists.length === 0 ? (

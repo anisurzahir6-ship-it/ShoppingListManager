@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import API_URL from "../api";
 
 function Register() {
   const [name, setName] = useState("");
@@ -14,7 +15,7 @@ function Register() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/auth/register",
+        `${API_URL}/api/auth/register`,
         {
           name,
           email,
@@ -23,9 +24,13 @@ function Register() {
       );
 
       alert("Registration successful!");
+
       navigate("/login");
     } catch (error) {
-      alert(error.response?.data?.message || "Registration failed");
+      alert(
+        error.response?.data?.message ||
+          "Registration failed"
+      );
     }
   };
 
@@ -38,7 +43,9 @@ function Register() {
           type="text"
           placeholder="Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) =>
+            setName(e.target.value)
+          }
           required
         />
 
@@ -46,7 +53,9 @@ function Register() {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           required
         />
 
@@ -54,15 +63,22 @@ function Register() {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
           required
         />
 
-        <button type="submit">Register</button>
+        <button type="submit">
+          Register
+        </button>
       </form>
 
       <p>
-        Already have an account? <Link to="/login">Login</Link>
+        Already have an account?{" "}
+        <Link to="/login">
+          Login
+        </Link>
       </p>
     </div>
   );

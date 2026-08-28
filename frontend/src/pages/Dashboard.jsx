@@ -3,6 +3,7 @@ import "./Dashboard.css";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../api";
 
 function Dashboard() {
   const [lists, setLists] = useState([]);
@@ -41,7 +42,7 @@ function Dashboard() {
   const fetchLists = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/lists",
+        `${API_URL}/api/lists`,
         authHeaders
       );
 
@@ -58,7 +59,7 @@ function Dashboard() {
         fetchedLists.map(async (list) => {
           try {
             const itemResponse = await axios.get(
-              `http://localhost:5000/api/lists/${list._id}/items`,
+              `${API_URL}/api/lists/${list._id}/items`,
               authHeaders
             );
 
@@ -132,7 +133,7 @@ function Dashboard() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/lists",
+        `${API_URL}/api/lists`,
         {
           name,
           description,
@@ -184,7 +185,7 @@ function Dashboard() {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/lists/${listId}`,
+        `${API_URL}/api/lists/${listId}`,
         {
           name: editName,
           description: editDescription,
@@ -222,7 +223,7 @@ function Dashboard() {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/lists/${listId}`,
+        `${API_URL}/api/lists/${listId}`,
         authHeaders
       );
 

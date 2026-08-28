@@ -3,6 +3,7 @@ import "./History.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../api";
 
 function History() {
   const [history, setHistory] = useState([]);
@@ -30,7 +31,7 @@ function History() {
       }
 
       const response = await axios.get(
-        "http://localhost:5000/api/history",
+        `${API_URL}/api/history`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

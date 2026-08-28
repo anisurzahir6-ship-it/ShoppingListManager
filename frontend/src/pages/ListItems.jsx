@@ -3,6 +3,7 @@ import "./ListItems.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import API_URL from "../api";
 
 function ListItems() {
   const { id } = useParams();
@@ -43,13 +44,16 @@ function ListItems() {
   const fetchList = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/lists/${id}`,
+        `${API_URL}/api/lists/${id}`,
         { headers }
       );
 
       setList(response.data);
     } catch (error) {
-      console.error("Failed to fetch list:", error);
+      console.error(
+        "Failed to fetch list:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -65,13 +69,16 @@ function ListItems() {
   const fetchItems = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/lists/${id}/items`,
+        `${API_URL}/api/lists/${id}/items`,
         { headers }
       );
 
       setItems(response.data);
     } catch (error) {
-      console.error("Failed to fetch items:", error);
+      console.error(
+        "Failed to fetch items:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -106,7 +113,7 @@ function ListItems() {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/lists/${id}/items`,
+        `${API_URL}/api/lists/${id}/items`,
         {
           name: name.trim(),
           quantity: Number(quantity),
@@ -123,7 +130,10 @@ function ListItems() {
 
       fetchItems();
     } catch (error) {
-      console.error("Failed to add item:", error);
+      console.error(
+        "Failed to add item:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -141,7 +151,9 @@ function ListItems() {
     setEditName(item.name);
     setEditQuantity(item.quantity);
     setEditUnit(item.unit);
-    setEditCategory(item.category || "Other");
+    setEditCategory(
+      item.category || "Other"
+    );
   };
 
   // ==========================================
@@ -173,7 +185,7 @@ function ListItems() {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/lists/${id}/items/${itemId}`,
+        `${API_URL}/api/lists/${id}/items/${itemId}`,
         {
           name: editName.trim(),
           quantity: Number(editQuantity),
@@ -186,7 +198,10 @@ function ListItems() {
       cancelEditing();
       fetchItems();
     } catch (error) {
-      console.error("Failed to update item:", error);
+      console.error(
+        "Failed to update item:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -202,7 +217,7 @@ function ListItems() {
   const togglePurchased = async (item) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/lists/${id}/items/${item._id}`,
+        `${API_URL}/api/lists/${id}/items/${item._id}`,
         {
           purchased: !item.purchased,
         },
@@ -211,7 +226,10 @@ function ListItems() {
 
       fetchItems();
     } catch (error) {
-      console.error("Failed to update item:", error);
+      console.error(
+        "Failed to update item:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -235,13 +253,16 @@ function ListItems() {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/lists/${id}/items/${itemId}`,
+        `${API_URL}/api/lists/${id}/items/${itemId}`,
         { headers }
       );
 
       fetchItems();
     } catch (error) {
-      console.error("Failed to delete item:", error);
+      console.error(
+        "Failed to delete item:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -256,11 +277,14 @@ function ListItems() {
 
   const filteredItems = items.filter((item) => {
     const itemName = item.name || "";
-    const itemCategory = item.category || "Other";
+    const itemCategory =
+      item.category || "Other";
 
     const matchesSearch = itemName
       .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+      .includes(
+        searchTerm.toLowerCase()
+      );
 
     const matchesCategory =
       categoryFilter === "All" ||
@@ -268,8 +292,10 @@ function ListItems() {
 
     const matchesStatus =
       statusFilter === "All" ||
-      (statusFilter === "Purchased" && item.purchased) ||
-      (statusFilter === "Remaining" && !item.purchased);
+      (statusFilter === "Purchased" &&
+        item.purchased) ||
+      (statusFilter === "Remaining" &&
+        !item.purchased);
 
     return (
       matchesSearch &&
@@ -295,14 +321,17 @@ function ListItems() {
     totalItems === 0
       ? 0
       : Math.round(
-          (purchasedItems / totalItems) * 100
+          (purchasedItems / totalItems) *
+            100
         );
 
   // ==========================================
   // CATEGORY ICON
   // ==========================================
 
-  const getCategoryIcon = (itemCategory) => {
+  const getCategoryIcon = (
+    itemCategory
+  ) => {
     const icons = {
       Grains: "🌾",
       Vegetables: "🥬",
@@ -348,6 +377,7 @@ function ListItems() {
       <header className="list-items-header">
 
         <div className="list-brand">
+
           <button
             className="mini-brand"
             onClick={() =>
@@ -358,14 +388,18 @@ function ListItems() {
           </button>
 
           <div>
+
             <span className="brand-small">
               SHOPPING LIST MANAGER
             </span>
 
             <h1>
-              {list?.name || "Shopping List"}
+              {list?.name ||
+                "Shopping List"}
             </h1>
+
           </div>
+
         </div>
 
         <div className="header-actions">
@@ -405,7 +439,8 @@ function ListItems() {
           </span>
 
           <h2>
-            {list?.name || "Shopping List"}
+            {list?.name ||
+              "Shopping List"}
           </h2>
 
           <p>
@@ -449,6 +484,7 @@ function ListItems() {
         <div className="progress-top">
 
           <div>
+
             <span className="section-label">
               SHOPPING PROGRESS
             </span>
@@ -458,6 +494,7 @@ function ListItems() {
                 ? "Shopping complete!"
                 : "Keep going"}
             </h3>
+
           </div>
 
           <strong>
@@ -478,6 +515,7 @@ function ListItems() {
         </div>
 
         <div className="progress-footer">
+
           <span>
             {purchasedItems} of{" "}
             {totalItems} items purchased
@@ -486,6 +524,7 @@ function ListItems() {
           <span>
             {remainingItems} remaining
           </span>
+
         </div>
 
       </section>
@@ -504,7 +543,9 @@ function ListItems() {
 
           <div>
             <span>Total Items</span>
-            <strong>{totalItems}</strong>
+            <strong>
+              {totalItems}
+            </strong>
           </div>
 
         </div>
@@ -517,7 +558,9 @@ function ListItems() {
 
           <div>
             <span>Purchased</span>
-            <strong>{purchasedItems}</strong>
+            <strong>
+              {purchasedItems}
+            </strong>
           </div>
 
         </div>
@@ -530,7 +573,9 @@ function ListItems() {
 
           <div>
             <span>Remaining</span>
-            <strong>{remainingItems}</strong>
+            <strong>
+              {remainingItems}
+            </strong>
           </div>
 
         </div>
@@ -601,7 +646,9 @@ function ListItems() {
               min="1"
               value={quantity}
               onChange={(e) =>
-                setQuantity(e.target.value)
+                setQuantity(
+                  e.target.value
+                )
               }
             />
 
@@ -619,6 +666,7 @@ function ListItems() {
                 setUnit(e.target.value)
               }
             >
+
               <option value="piece">
                 Piece
               </option>
@@ -650,6 +698,7 @@ function ListItems() {
               <option value="bottle">
                 Bottle
               </option>
+
             </select>
 
           </div>
@@ -663,9 +712,12 @@ function ListItems() {
             <select
               value={category}
               onChange={(e) =>
-                setCategory(e.target.value)
+                setCategory(
+                  e.target.value
+                )
               }
             >
+
               <option value="Other">
                 Other
               </option>
@@ -701,6 +753,7 @@ function ListItems() {
               <option value="Condiments">
                 Condiments
               </option>
+
             </select>
 
           </div>
@@ -760,7 +813,9 @@ function ListItems() {
               placeholder="Search your items..."
               value={searchTerm}
               onChange={(e) =>
-                setSearchTerm(e.target.value)
+                setSearchTerm(
+                  e.target.value
+                )
               }
             />
 
@@ -783,9 +838,12 @@ function ListItems() {
             <select
               value={categoryFilter}
               onChange={(e) =>
-                setCategoryFilter(e.target.value)
+                setCategoryFilter(
+                  e.target.value
+                )
               }
             >
+
               <option value="All">
                 All Categories
               </option>
@@ -825,14 +883,18 @@ function ListItems() {
               <option value="Other">
                 Other
               </option>
+
             </select>
 
             <select
               value={statusFilter}
               onChange={(e) =>
-                setStatusFilter(e.target.value)
+                setStatusFilter(
+                  e.target.value
+                )
               }
             >
+
               <option value="All">
                 All Status
               </option>
@@ -844,6 +906,7 @@ function ListItems() {
               <option value="Purchased">
                 Purchased
               </option>
+
             </select>
 
           </div>
@@ -894,7 +957,8 @@ function ListItems() {
             </h3>
 
             <p>
-              Try changing your search or filters.
+              Try changing your search or
+              filters.
             </p>
 
             <button
@@ -944,6 +1008,7 @@ function ListItems() {
                       </div>
 
                       <div>
+
                         <span className="section-label">
                           UPDATE PRODUCT
                         </span>
@@ -951,6 +1016,7 @@ function ListItems() {
                         <h3>
                           Edit Item
                         </h3>
+
                       </div>
 
                     </div>
@@ -984,7 +1050,9 @@ function ListItems() {
                         <input
                           type="number"
                           min="1"
-                          value={editQuantity}
+                          value={
+                            editQuantity
+                          }
                           onChange={(e) =>
                             setEditQuantity(
                               e.target.value
@@ -1008,6 +1076,7 @@ function ListItems() {
                             )
                           }
                         >
+
                           <option value="piece">
                             Piece
                           </option>
@@ -1039,6 +1108,7 @@ function ListItems() {
                           <option value="bottle">
                             Bottle
                           </option>
+
                         </select>
 
                       </div>
@@ -1059,6 +1129,7 @@ function ListItems() {
                           )
                         }
                       >
+
                         <option value="Other">
                           Other
                         </option>
@@ -1094,6 +1165,7 @@ function ListItems() {
                         <option value="Condiments">
                           Condiments
                         </option>
+
                       </select>
 
                     </div>
@@ -1103,7 +1175,9 @@ function ListItems() {
                       <button
                         className="save-button"
                         onClick={() =>
-                          updateItem(item._id)
+                          updateItem(
+                            item._id
+                          )
                         }
                       >
                         ✓ Save Changes
@@ -1111,7 +1185,9 @@ function ListItems() {
 
                       <button
                         className="cancel-button"
-                        onClick={cancelEditing}
+                        onClick={
+                          cancelEditing
+                        }
                       >
                         Cancel
                       </button>
@@ -1216,7 +1292,9 @@ function ListItems() {
                             : "purchase-button"
                         }
                         onClick={() =>
-                          togglePurchased(item)
+                          togglePurchased(
+                            item
+                          )
                         }
                       >
                         {item.purchased
@@ -1239,7 +1317,9 @@ function ListItems() {
                         <button
                           className="delete-button"
                           onClick={() =>
-                            deleteItem(item._id)
+                            deleteItem(
+                              item._id
+                            )
                           }
                           title="Delete item"
                         >
