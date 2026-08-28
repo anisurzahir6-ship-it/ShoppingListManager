@@ -12,7 +12,7 @@ function ListItems() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Search and filter
+  // Search and filters
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -36,9 +36,9 @@ function ListItems() {
     Authorization: `Bearer ${token}`,
   };
 
-  // ================================
+  // ==========================================
   // FETCH LIST
-  // ================================
+  // ==========================================
 
   const fetchList = async () => {
     try {
@@ -58,9 +58,9 @@ function ListItems() {
     }
   };
 
-  // ================================
+  // ==========================================
   // FETCH ITEMS
-  // ================================
+  // ==========================================
 
   const fetchItems = async () => {
     try {
@@ -87,9 +87,9 @@ function ListItems() {
     fetchItems();
   }, [id]);
 
-  // ================================
+  // ==========================================
   // ADD ITEM
-  // ================================
+  // ==========================================
 
   const addItem = async (e) => {
     e.preventDefault();
@@ -132,21 +132,21 @@ function ListItems() {
     }
   };
 
-  // ================================
+  // ==========================================
   // START EDITING
-  // ================================
+  // ==========================================
 
   const startEditing = (item) => {
     setEditingId(item._id);
     setEditName(item.name);
     setEditQuantity(item.quantity);
     setEditUnit(item.unit);
-    setEditCategory(item.category);
+    setEditCategory(item.category || "Other");
   };
 
-  // ================================
+  // ==========================================
   // CANCEL EDIT
-  // ================================
+  // ==========================================
 
   const cancelEditing = () => {
     setEditingId(null);
@@ -156,9 +156,9 @@ function ListItems() {
     setEditCategory("Other");
   };
 
-  // ================================
+  // ==========================================
   // UPDATE ITEM
-  // ================================
+  // ==========================================
 
   const updateItem = async (itemId) => {
     if (!editName.trim()) {
@@ -195,9 +195,9 @@ function ListItems() {
     }
   };
 
-  // ================================
+  // ==========================================
   // PURCHASE TOGGLE
-  // ================================
+  // ==========================================
 
   const togglePurchased = async (item) => {
     try {
@@ -220,12 +220,16 @@ function ListItems() {
     }
   };
 
-  // ================================
+  // ==========================================
   // DELETE ITEM
-  // ================================
+  // ==========================================
 
   const deleteItem = async (itemId) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this item?"
+      )
+    ) {
       return;
     }
 
@@ -246,9 +250,9 @@ function ListItems() {
     }
   };
 
-  // ================================
+  // ==========================================
   // FILTER ITEMS
-  // ================================
+  // ==========================================
 
   const filteredItems = items.filter((item) => {
     const itemName = item.name || "";
@@ -274,9 +278,9 @@ function ListItems() {
     );
   });
 
-  // ================================
+  // ==========================================
   // STATISTICS
-  // ================================
+  // ==========================================
 
   const totalItems = items.length;
 
@@ -294,134 +298,274 @@ function ListItems() {
           (purchasedItems / totalItems) * 100
         );
 
-  // ================================
+  // ==========================================
+  // CATEGORY ICON
+  // ==========================================
+
+  const getCategoryIcon = (itemCategory) => {
+    const icons = {
+      Grains: "🌾",
+      Vegetables: "🥬",
+      Fruits: "🍎",
+      Meat: "🥩",
+      Dairy: "🥛",
+      Beverages: "🥤",
+      Snacks: "🍿",
+      Condiments: "🧂",
+      Other: "🛒",
+    };
+
+    return icons[itemCategory] || "🛒";
+  };
+
+  // ==========================================
   // LOADING
-  // ================================
+  // ==========================================
 
   if (loading) {
     return (
       <div className="list-items-loading">
         <div className="loading-spinner"></div>
-        <p>Loading your shopping list...</p>
+
+        <p>
+          Loading your shopping list...
+        </p>
       </div>
     );
   }
 
-  // ================================
+  // ==========================================
   // UI
-  // ================================
+  // ==========================================
 
   return (
     <div className="list-items-page">
 
-      {/* ================= HEADER ================= */}
+      {/* ======================================
+          HEADER
+      ====================================== */}
 
       <header className="list-items-header">
 
-        <div className="list-title-area">
-          <div className="list-icon">🛒</div>
+        <div className="list-brand">
+          <button
+            className="mini-brand"
+            onClick={() =>
+              navigate("/dashboard")
+            }
+          >
+            🛒
+          </button>
 
           <div>
-            <span className="eyebrow">
-              SHOPPING LIST
+            <span className="brand-small">
+              SHOPPING LIST MANAGER
             </span>
 
             <h1>
               {list?.name || "Shopping List"}
             </h1>
-
-            {list?.description && (
-              <p className="list-description">
-                {list.description}
-              </p>
-            )}
           </div>
         </div>
 
-        <button
-          className="back-button"
-          onClick={() => navigate("/dashboard")}
-        >
-          ← Dashboard
-        </button>
+        <div className="header-actions">
+
+          <button
+            className="header-button"
+            onClick={() =>
+              navigate("/dashboard")
+            }
+          >
+            ← Dashboard
+          </button>
+
+          <button
+            className="header-button"
+            onClick={() =>
+              navigate("/history")
+            }
+          >
+            🕘 History
+          </button>
+
+        </div>
 
       </header>
 
-      {/* ================= PROGRESS ================= */}
+      {/* ======================================
+          HERO
+      ====================================== */}
 
-      <section className="list-progress-section">
+      <section className="list-hero">
 
-        <div className="progress-header">
+        <div className="hero-content">
 
-          <div>
-            <span>Shopping Progress</span>
+          <span className="hero-eyebrow">
+            YOUR SHOPPING LIST
+          </span>
 
-            <strong>
-              {purchasedItems} of {totalItems} purchased
-            </strong>
-          </div>
+          <h2>
+            {list?.name || "Shopping List"}
+          </h2>
 
-          <div className="progress-percentage">
-            {progress}%
+          <p>
+            {list?.description ||
+              "Keep everything you need for your next shopping trip in one place."}
+          </p>
+
+          <div className="hero-meta">
+
+            <span>
+              🛍️ {totalItems}{" "}
+              {totalItems === 1
+                ? "item"
+                : "items"}
+            </span>
+
+            <span>
+              ✓ {purchasedItems} purchased
+            </span>
+
+            <span>
+              ⏳ {remainingItems} remaining
+            </span>
+
           </div>
 
         </div>
 
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${progress}%` }}
-          ></div>
+        <div className="hero-shopping-icon">
+          🛒
         </div>
 
       </section>
 
-      {/* ================= STAT CARDS ================= */}
+      {/* ======================================
+          PROGRESS
+      ====================================== */}
+
+      <section className="progress-card">
+
+        <div className="progress-top">
+
+          <div>
+            <span className="section-label">
+              SHOPPING PROGRESS
+            </span>
+
+            <h3>
+              {progress === 100
+                ? "Shopping complete!"
+                : "Keep going"}
+            </h3>
+          </div>
+
+          <strong>
+            {progress}%
+          </strong>
+
+        </div>
+
+        <div className="progress-track">
+
+          <div
+            className="progress-fill"
+            style={{
+              width: `${progress}%`,
+            }}
+          ></div>
+
+        </div>
+
+        <div className="progress-footer">
+          <span>
+            {purchasedItems} of{" "}
+            {totalItems} items purchased
+          </span>
+
+          <span>
+            {remainingItems} remaining
+          </span>
+        </div>
+
+      </section>
+
+      {/* ======================================
+          STATISTICS
+      ====================================== */}
 
       <section className="item-stat-grid">
 
         <div className="item-stat-card">
-          <div className="stat-icon">🛍️</div>
+
+          <div className="stat-card-icon purple">
+            🛍️
+          </div>
+
           <div>
             <span>Total Items</span>
             <strong>{totalItems}</strong>
           </div>
+
         </div>
 
         <div className="item-stat-card">
-          <div className="stat-icon">✅</div>
+
+          <div className="stat-card-icon green">
+            ✓
+          </div>
+
           <div>
             <span>Purchased</span>
             <strong>{purchasedItems}</strong>
           </div>
+
         </div>
 
         <div className="item-stat-card">
-          <div className="stat-icon">⏳</div>
+
+          <div className="stat-card-icon orange">
+            ⏳
+          </div>
+
           <div>
             <span>Remaining</span>
             <strong>{remainingItems}</strong>
           </div>
+
         </div>
 
       </section>
 
-      {/* ================= ADD ITEM ================= */}
+      {/* ======================================
+          ADD ITEM
+      ====================================== */}
 
       <section className="add-item-section">
 
-        <div className="section-heading">
+        <div className="section-title-row">
+
           <div>
-            <span className="eyebrow">
+
+            <span className="section-label">
               QUICK ADD
             </span>
 
-            <h2>Add an Item</h2>
+            <h2>
+              Add items to your list
+            </h2>
+
+            <p>
+              Add products you need for your
+              next shopping trip.
+            </p>
+
           </div>
 
-          <span className="section-icon">
+          <div className="section-symbol">
             ＋
-          </span>
+          </div>
+
         </div>
 
         <form
@@ -430,7 +574,10 @@ function ListItems() {
         >
 
           <div className="form-field item-name-field">
-            <label>Item Name</label>
+
+            <label>
+              Item Name
+            </label>
 
             <input
               type="text"
@@ -440,10 +587,14 @@ function ListItems() {
                 setName(e.target.value)
               }
             />
+
           </div>
 
           <div className="form-field">
-            <label>Quantity</label>
+
+            <label>
+              Quantity
+            </label>
 
             <input
               type="number"
@@ -453,10 +604,14 @@ function ListItems() {
                 setQuantity(e.target.value)
               }
             />
+
           </div>
 
           <div className="form-field">
-            <label>Unit</label>
+
+            <label>
+              Unit
+            </label>
 
             <select
               value={unit}
@@ -464,19 +619,46 @@ function ListItems() {
                 setUnit(e.target.value)
               }
             >
-              <option value="piece">Piece</option>
-              <option value="kg">Kg</option>
-              <option value="g">Gram</option>
-              <option value="liter">Liter</option>
-              <option value="ml">Ml</option>
-              <option value="pack">Pack</option>
-              <option value="dozen">Dozen</option>
-              <option value="bottle">Bottle</option>
+              <option value="piece">
+                Piece
+              </option>
+
+              <option value="kg">
+                Kg
+              </option>
+
+              <option value="g">
+                Gram
+              </option>
+
+              <option value="liter">
+                Liter
+              </option>
+
+              <option value="ml">
+                Ml
+              </option>
+
+              <option value="pack">
+                Pack
+              </option>
+
+              <option value="dozen">
+                Dozen
+              </option>
+
+              <option value="bottle">
+                Bottle
+              </option>
             </select>
+
           </div>
 
           <div className="form-field">
-            <label>Category</label>
+
+            <label>
+              Category
+            </label>
 
             <select
               value={category}
@@ -484,47 +666,75 @@ function ListItems() {
                 setCategory(e.target.value)
               }
             >
-              <option value="Other">Other</option>
-              <option value="Grains">Grains</option>
+              <option value="Other">
+                Other
+              </option>
+
+              <option value="Grains">
+                Grains
+              </option>
+
               <option value="Vegetables">
                 Vegetables
               </option>
-              <option value="Fruits">Fruits</option>
-              <option value="Meat">Meat</option>
-              <option value="Dairy">Dairy</option>
+
+              <option value="Fruits">
+                Fruits
+              </option>
+
+              <option value="Meat">
+                Meat
+              </option>
+
+              <option value="Dairy">
+                Dairy
+              </option>
+
               <option value="Beverages">
                 Beverages
               </option>
-              <option value="Snacks">Snacks</option>
+
+              <option value="Snacks">
+                Snacks
+              </option>
+
               <option value="Condiments">
                 Condiments
               </option>
             </select>
+
           </div>
 
           <button
             className="add-item-button"
             type="submit"
           >
-            + Add Item
+            <span>＋</span>
+            Add Item
           </button>
 
         </form>
 
       </section>
 
-      {/* ================= ITEMS ================= */}
+      {/* ======================================
+          ITEMS SECTION
+      ====================================== */}
 
       <section className="shopping-items-section">
 
-        <div className="section-heading items-heading">
+        <div className="items-section-header">
 
           <div>
-            <span className="eyebrow">
-              YOUR ITEMS
+
+            <span className="section-label">
+              YOUR COLLECTION
             </span>
 
-            <h2>Shopping Items</h2>
+            <h2>
+              Shopping Items
+            </h2>
+
           </div>
 
           <span className="item-count">
@@ -533,17 +743,21 @@ function ListItems() {
 
         </div>
 
-        {/* ================= FILTERS ================= */}
+        {/* ====================================
+            SEARCH + FILTERS
+        ==================================== */}
 
-        <div className="item-filters">
+        <div className="item-toolbar">
 
-          <div className="search-box">
+          <div className="item-search">
 
-            <span>🔎</span>
+            <span>
+              🔍
+            </span>
 
             <input
               type="text"
-              placeholder="Search items..."
+              placeholder="Search your items..."
               value={searchTerm}
               onChange={(e) =>
                 setSearchTerm(e.target.value)
@@ -564,76 +778,120 @@ function ListItems() {
 
           </div>
 
-          <select
-            value={categoryFilter}
-            onChange={(e) =>
-              setCategoryFilter(e.target.value)
-            }
-          >
-            <option value="All">
-              All Categories
-            </option>
-            <option value="Grains">Grains</option>
-            <option value="Vegetables">
-              Vegetables
-            </option>
-            <option value="Fruits">Fruits</option>
-            <option value="Meat">Meat</option>
-            <option value="Dairy">Dairy</option>
-            <option value="Beverages">
-              Beverages
-            </option>
-            <option value="Snacks">Snacks</option>
-            <option value="Condiments">
-              Condiments
-            </option>
-            <option value="Other">Other</option>
-          </select>
+          <div className="item-filter-group">
 
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value)
-            }
-          >
-            <option value="All">
-              All Status
-            </option>
-            <option value="Remaining">
-              Remaining
-            </option>
-            <option value="Purchased">
-              Purchased
-            </option>
-          </select>
+            <select
+              value={categoryFilter}
+              onChange={(e) =>
+                setCategoryFilter(e.target.value)
+              }
+            >
+              <option value="All">
+                All Categories
+              </option>
+
+              <option value="Grains">
+                Grains
+              </option>
+
+              <option value="Vegetables">
+                Vegetables
+              </option>
+
+              <option value="Fruits">
+                Fruits
+              </option>
+
+              <option value="Meat">
+                Meat
+              </option>
+
+              <option value="Dairy">
+                Dairy
+              </option>
+
+              <option value="Beverages">
+                Beverages
+              </option>
+
+              <option value="Snacks">
+                Snacks
+              </option>
+
+              <option value="Condiments">
+                Condiments
+              </option>
+
+              <option value="Other">
+                Other
+              </option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value)
+              }
+            >
+              <option value="All">
+                All Status
+              </option>
+
+              <option value="Remaining">
+                Remaining
+              </option>
+
+              <option value="Purchased">
+                Purchased
+              </option>
+            </select>
+
+          </div>
 
         </div>
 
-        {/* ================= RESULTS ================= */}
+        {/* ====================================
+            EMPTY STATE
+        ==================================== */}
 
         {items.length === 0 ? (
 
           <div className="empty-items">
-            <div className="empty-icon">
+
+            <div className="empty-items-icon">
               🛒
             </div>
 
-            <h3>Your list is empty</h3>
+            <span className="section-label">
+              NOTHING HERE YET
+            </span>
+
+            <h3>
+              Your shopping list is empty
+            </h3>
 
             <p>
-              Add your first shopping item above
-              to get started.
+              Add your first item using the
+              form above.
             </p>
+
           </div>
 
         ) : filteredItems.length === 0 ? (
 
           <div className="empty-items">
-            <div className="empty-icon">
+
+            <div className="empty-items-icon">
               🔎
             </div>
 
-            <h3>No items found</h3>
+            <span className="section-label">
+              NO RESULTS
+            </span>
+
+            <h3>
+              No items found
+            </h3>
 
             <p>
               Try changing your search or filters.
@@ -649,15 +907,20 @@ function ListItems() {
             >
               Reset Filters
             </button>
+
           </div>
 
         ) : (
+
+          /* ====================================
+             ITEM GRID
+          ==================================== */
 
           <div className="items-grid">
 
             {filteredItems.map((item) => (
 
-              <div
+              <article
                 key={item._id}
                 className={`item-card ${
                   item.purchased
@@ -668,17 +931,35 @@ function ListItems() {
 
                 {editingId === item._id ? (
 
-                  /* ================= EDIT ================= */
+                  /* =============================
+                     EDIT MODE
+                  ============================= */
 
                   <div className="edit-item-form">
 
-                    <div className="edit-heading">
-                      <span>✏️</span>
-                      <h3>Edit Item</h3>
+                    <div className="edit-title">
+
+                      <div className="edit-icon">
+                        ✏️
+                      </div>
+
+                      <div>
+                        <span className="section-label">
+                          UPDATE PRODUCT
+                        </span>
+
+                        <h3>
+                          Edit Item
+                        </h3>
+                      </div>
+
                     </div>
 
                     <div className="form-field">
-                      <label>Item Name</label>
+
+                      <label>
+                        Item Name
+                      </label>
 
                       <input
                         type="text"
@@ -689,12 +970,16 @@ function ListItems() {
                           )
                         }
                       />
+
                     </div>
 
                     <div className="edit-form-grid">
 
                       <div className="form-field">
-                        <label>Quantity</label>
+
+                        <label>
+                          Quantity
+                        </label>
 
                         <input
                           type="number"
@@ -706,10 +991,14 @@ function ListItems() {
                             )
                           }
                         />
+
                       </div>
 
                       <div className="form-field">
-                        <label>Unit</label>
+
+                        <label>
+                          Unit
+                        </label>
 
                         <select
                           value={editUnit}
@@ -722,34 +1011,45 @@ function ListItems() {
                           <option value="piece">
                             Piece
                           </option>
+
                           <option value="kg">
                             Kg
                           </option>
+
                           <option value="g">
                             Gram
                           </option>
+
                           <option value="liter">
                             Liter
                           </option>
+
                           <option value="ml">
                             Ml
                           </option>
+
                           <option value="pack">
                             Pack
                           </option>
+
                           <option value="dozen">
                             Dozen
                           </option>
+
                           <option value="bottle">
                             Bottle
                           </option>
                         </select>
+
                       </div>
 
                     </div>
 
                     <div className="form-field">
-                      <label>Category</label>
+
+                      <label>
+                        Category
+                      </label>
 
                       <select
                         value={editCategory}
@@ -762,34 +1062,43 @@ function ListItems() {
                         <option value="Other">
                           Other
                         </option>
+
                         <option value="Grains">
                           Grains
                         </option>
+
                         <option value="Vegetables">
                           Vegetables
                         </option>
+
                         <option value="Fruits">
                           Fruits
                         </option>
+
                         <option value="Meat">
                           Meat
                         </option>
+
                         <option value="Dairy">
                           Dairy
                         </option>
+
                         <option value="Beverages">
                           Beverages
                         </option>
+
                         <option value="Snacks">
                           Snacks
                         </option>
+
                         <option value="Condiments">
                           Condiments
                         </option>
                       </select>
+
                     </div>
 
-                    <div className="edit-item-actions">
+                    <div className="edit-actions">
 
                       <button
                         className="save-button"
@@ -813,16 +1122,26 @@ function ListItems() {
 
                 ) : (
 
-                  /* ================= NORMAL CARD ================= */
+                  /* =============================
+                     NORMAL ITEM CARD
+                  ============================= */
 
                   <>
 
                     <div className="item-card-top">
 
-                      <div className="item-category-icon">
+                      <div
+                        className={`product-icon ${
+                          item.purchased
+                            ? "product-icon-purchased"
+                            : ""
+                        }`}
+                      >
                         {item.purchased
                           ? "✓"
-                          : "🛒"}
+                          : getCategoryIcon(
+                              item.category
+                            )}
                       </div>
 
                       <span
@@ -839,26 +1158,51 @@ function ListItems() {
 
                     </div>
 
-                    <h3 className="item-name">
-                      {item.name}
-                    </h3>
+                    <div className="product-info">
 
-                    <div className="item-details">
+                      <span className="product-category">
+                        {item.category ||
+                          "Other"}
+                      </span>
 
-                      <div className="item-detail">
-                        <span>Quantity</span>
+                      <h3
+                        className={
+                          item.purchased
+                            ? "item-name purchased-name"
+                            : "item-name"
+                        }
+                      >
+                        {item.name}
+                      </h3>
+
+                    </div>
+
+                    <div className="product-details">
+
+                      <div>
+
+                        <span>
+                          Quantity
+                        </span>
+
                         <strong>
                           {item.quantity}{" "}
                           {item.unit}
                         </strong>
+
                       </div>
 
-                      <div className="item-detail">
-                        <span>Category</span>
+                      <div>
+
+                        <span>
+                          Category
+                        </span>
+
                         <strong>
                           {item.category ||
                             "Other"}
                         </strong>
+
                       </div>
 
                     </div>
@@ -880,23 +1224,29 @@ function ListItems() {
                           : "✓ Mark Purchased"}
                       </button>
 
-                      <button
-                        className="edit-button"
-                        onClick={() =>
-                          startEditing(item)
-                        }
-                      >
-                        ✏️ Edit
-                      </button>
+                      <div className="secondary-actions">
 
-                      <button
-                        className="delete-button"
-                        onClick={() =>
-                          deleteItem(item._id)
-                        }
-                      >
-                        🗑 Delete
-                      </button>
+                        <button
+                          className="edit-button"
+                          onClick={() =>
+                            startEditing(item)
+                          }
+                          title="Edit item"
+                        >
+                          ✏️
+                        </button>
+
+                        <button
+                          className="delete-button"
+                          onClick={() =>
+                            deleteItem(item._id)
+                          }
+                          title="Delete item"
+                        >
+                          🗑️
+                        </button>
+
+                      </div>
 
                     </div>
 
@@ -904,7 +1254,7 @@ function ListItems() {
 
                 )}
 
-              </div>
+              </article>
 
             ))}
 

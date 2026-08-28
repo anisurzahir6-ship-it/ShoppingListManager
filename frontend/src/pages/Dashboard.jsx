@@ -1,33 +1,28 @@
 import "./Dashboard.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [lists, setLists] = useState([]);
+  const [listStats, setListStats] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Dashboard statistics
   const [totalItems, setTotalItems] = useState(0);
   const [purchasedItems, setPurchasedItems] = useState(0);
 
-  // List search/filter
   const [searchTerm, setSearchTerm] = useState("");
   const [listFilter, setListFilter] = useState("All");
 
-  // Create list
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
 
-  // Edit list
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
-  const [editDescription, setEditDescription] =
-    useState("");
-  const [editRecurring, setEditRecurring] =
-    useState(false);
+  const [editDescription, setEditDescription] = useState("");
+  const [editRecurring, setEditRecurring] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,7 +35,7 @@ function Dashboard() {
   };
 
   // ==========================================
-  // FETCH LISTS
+  // FETCH LISTS + ITEMS
   // ==========================================
 
   const fetchLists = async () => {
@@ -56,64 +51,59 @@ function Dashboard() {
 
       setLists(fetchedLists);
 
-      // ========================================
-      // FETCH ITEMS FOR STATISTICS
-      // ========================================
-
       let allItems = [];
+      const stats = {};
 
-      try {
-        const itemResponses = await Promise.all(
-          fetchedLists.map(async (list) => {
-            try {
-              const itemResponse =
-                await axios.get(
-                  `http://localhost:5000/api/lists/${list._id}/items`,
-                  authHeaders
-                );
+      const itemResponses = await Promise.all(
+        fetchedLists.map(async (list) => {
+          try {
+            const itemResponse = await axios.get(
+              `http://localhost:5000/api/lists/${list._id}/items`,
+              authHeaders
+            );
 
-              return Array.isArray(itemResponse.data)
-                ? itemResponse.data
-                : [];
-            } catch (error) {
-              console.error(
-                `Failed to fetch items for ${list.name}:`,
-                error
-              );
+            const items = Array.isArray(itemResponse.data)
+              ? itemResponse.data
+              : [];
 
-              return [];
-            }
-          })
-        );
+            stats[list._id] = {
+              total: items.length,
+              purchased: items.filter(
+                (item) => item.purchased === true
+              ).length,
+            };
 
-        itemResponses.forEach((listItems) => {
-          allItems = [
-            ...allItems,
-            ...listItems,
-          ];
-        });
+            return items;
+          } catch (error) {
+            console.error(
+              `Failed to fetch items for ${list.name}:`,
+              error
+            );
 
-        setTotalItems(allItems.length);
+            stats[list._id] = {
+              total: 0,
+              purchased: 0,
+            };
 
-        setPurchasedItems(
-          allItems.filter(
-            (item) => item.purchased === true
-          ).length
-        );
-      } catch (error) {
-        console.error(
-          "Failed to calculate statistics:",
-          error
-        );
-
-        setTotalItems(0);
-        setPurchasedItems(0);
-      }
-    } catch (error) {
-      console.error(
-        "Failed to fetch lists:",
-        error
+            return [];
+          }
+        })
       );
+
+      itemResponses.forEach((items) => {
+        allItems = [...allItems, ...items];
+      });
+
+      setListStats(stats);
+      setTotalItems(allItems.length);
+
+      setPurchasedItems(
+        allItems.filter(
+          (item) => item.purchased === true
+        ).length
+      );
+    } catch (error) {
+      console.error("Failed to fetch lists:", error);
 
       alert(
         error.response?.data?.message ||
@@ -155,16 +145,11 @@ function Dashboard() {
       setDescription("");
       setIsRecurring(false);
 
-      alert(
-        "Shopping list created successfully!"
-      );
+      alert("Shopping list created successfully!");
 
       fetchLists();
     } catch (error) {
-      console.error(
-        "Failed to create list:",
-        error
-      );
+      console.error("Failed to create list:", error);
 
       alert(
         error.response?.data?.message ||
@@ -174,23 +159,15 @@ function Dashboard() {
   };
 
   // ==========================================
-  // START EDITING
+  // EDIT LIST
   // ==========================================
 
   const startEditing = (list) => {
     setEditingId(list._id);
     setEditName(list.name);
-    setEditDescription(
-      list.description || ""
-    );
-    setEditRecurring(
-      list.isRecurring || false
-    );
+    setEditDescription(list.description || "");
+    setEditRecurring(list.isRecurring || false);
   };
-
-  // ==========================================
-  // CANCEL EDIT
-  // ==========================================
 
   const cancelEditing = () => {
     setEditingId(null);
@@ -198,10 +175,6 @@ function Dashboard() {
     setEditDescription("");
     setEditRecurring(false);
   };
-
-  // ==========================================
-  // UPDATE LIST
-  // ==========================================
 
   const updateList = async (listId) => {
     if (!editName.trim()) {
@@ -220,17 +193,12 @@ function Dashboard() {
         authHeaders
       );
 
-      alert(
-        "Shopping list updated successfully!"
-      );
+      alert("Shopping list updated successfully!");
 
       cancelEditing();
       fetchLists();
     } catch (error) {
-      console.error(
-        "Failed to update list:",
-        error
-      );
+      console.error("Failed to update list:", error);
 
       alert(
         error.response?.data?.message ||
@@ -243,10 +211,7 @@ function Dashboard() {
   // DELETE LIST
   // ==========================================
 
-  const deleteList = async (
-    listId,
-    listName
-  ) => {
+  const deleteList = async (listId, listName) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${listName}"?`
     );
@@ -261,16 +226,11 @@ function Dashboard() {
         authHeaders
       );
 
-      alert(
-        "Shopping list deleted successfully!"
-      );
+      alert("Shopping list deleted successfully!");
 
       fetchLists();
     } catch (error) {
-      console.error(
-        "Failed to delete list:",
-        error
-      );
+      console.error("Failed to delete list:", error);
 
       alert(
         error.response?.data?.message ||
@@ -314,30 +274,76 @@ function Dashboard() {
   // FILTER LISTS
   // ==========================================
 
-  const filteredLists = lists.filter((list) => {
-    const matchesSearch =
-      list.name
-        ?.toLowerCase()
-        .includes(
-          searchTerm.toLowerCase()
-        ) ||
-      list.description
-        ?.toLowerCase()
-        .includes(
-          searchTerm.toLowerCase()
-        );
+  const filteredLists = useMemo(() => {
+    return lists.filter((list) => {
+      const term = searchTerm.toLowerCase();
 
-    const matchesFilter =
-      listFilter === "All" ||
-      (listFilter === "Recurring" &&
-        list.isRecurring) ||
-      (listFilter === "Regular" &&
-        !list.isRecurring);
+      const matchesSearch =
+        list.name
+          ?.toLowerCase()
+          .includes(term) ||
+        list.description
+          ?.toLowerCase()
+          .includes(term);
 
-    return (
-      matchesSearch && matchesFilter
+      const matchesFilter =
+        listFilter === "All" ||
+        (listFilter === "Recurring" &&
+          list.isRecurring) ||
+        (listFilter === "Regular" &&
+          !list.isRecurring);
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [lists, searchTerm, listFilter]);
+
+  // ==========================================
+  // HELPERS
+  // ==========================================
+
+  const scrollToCreate = () => {
+    document
+      .getElementById("create-list")
+      ?.scrollIntoView({
+        behavior: "smooth",
+      });
+  };
+
+  const scrollToLists = () => {
+    document
+      .getElementById("shopping-lists")
+      ?.scrollIntoView({
+        behavior: "smooth",
+      });
+  };
+
+  const getListProgress = (listId) => {
+    const stats = listStats[listId];
+
+    if (!stats || stats.total === 0) {
+      return 0;
+    }
+
+    return Math.round(
+      (stats.purchased / stats.total) * 100
     );
-  });
+  };
+
+  const getListIcon = (list, index) => {
+    if (list.isRecurring) {
+      return "🔄";
+    }
+
+    const icons = [
+      "🛒",
+      "🎉",
+      "🏠",
+      "🥦",
+      "🧺",
+    ];
+
+    return icons[index % icons.length];
+  };
 
   // ==========================================
   // LOADING
@@ -347,7 +353,10 @@ function Dashboard() {
     return (
       <div className="dashboard-loading">
         <div className="loading-spinner"></div>
-        <p>Loading your shopping dashboard...</p>
+
+        <p>
+          Loading your shopping dashboard...
+        </p>
       </div>
     );
   }
@@ -357,367 +366,178 @@ function Dashboard() {
   // ==========================================
 
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-shell">
 
       {/* ======================================
-          TOP HEADER
+          SIDEBAR
       ====================================== */}
 
-      <header className="dashboard-header">
+      <aside className="dashboard-sidebar">
 
-        <div className="brand-section">
+        <div className="sidebar-brand">
 
-          <div className="brand-icon">
+          <div className="brand-mark">
             🛒
           </div>
 
           <div>
-            <h1>
-              Shopping List Manager
-            </h1>
+            <strong>
+              Shop<span>List</span>
+            </strong>
 
-            <p>
-              Plan smarter. Shop easier.
-            </p>
+            <small>
+              Manager
+            </small>
           </div>
 
         </div>
 
-        <nav className="dashboard-actions">
+        <nav
+          className="sidebar-nav"
+          aria-label="Main navigation"
+        >
 
           <button
-            className="primary-nav-button"
-            onClick={() =>
-              navigate("/ai")
-            }
+            className="sidebar-link active"
           >
-            ✨ AI Shopping List
+            <span>⌂</span>
+            Dashboard
           </button>
 
           <button
+            className="sidebar-link"
+            onClick={scrollToLists}
+          >
+            <span>▣</span>
+            My Lists
+          </button>
+
+          <button
+            className="sidebar-link"
+            onClick={scrollToCreate}
+          >
+            <span>⊞</span>
+            Create List
+          </button>
+
+          <button
+            className="sidebar-link"
             onClick={() =>
               navigate("/history")
             }
           >
-            🕘 Purchase History
+            <span>◷</span>
+            History
           </button>
 
           <button
-            className="logout-button"
-            onClick={logout}
+            className="sidebar-link"
+            onClick={() =>
+              navigate("/ai")
+            }
           >
-            Logout
+            <span>✦</span>
+            AI Generator
           </button>
 
         </nav>
 
-      </header>
+        {/* AI CARD */}
 
-      {/* ======================================
-          WELCOME BANNER
-      ====================================== */}
+        <div className="sidebar-ai">
 
-      <section className="welcome-banner">
+          <div className="ai-small-title">
 
-        <div>
+            <span>
+              AI POWERED
+            </span>
 
-          <span className="welcome-label">
-            YOUR SHOPPING OVERVIEW
-          </span>
+            <b>
+              ✦
+            </b>
 
-          <h2>
-            Ready for your next
-            shopping trip?
-          </h2>
+          </div>
+
+          <h3>
+            Plan your shopping in seconds.
+          </h3>
 
           <p>
-            Manage your lists, track purchases,
-            and let AI help you plan your groceries.
+            Generate a shopping list from
+            your meal plan or selected recipes.
           </p>
 
-        </div>
-
-        <button
-          className="banner-button"
-          onClick={() =>
-            document
-              .getElementById(
-                "create-list"
-              )
-              ?.scrollIntoView({
-                behavior: "smooth",
-              })
-          }
-        >
-          + Create New List
-        </button>
-
-      </section>
-
-      {/* ======================================
-          STATISTICS
-      ====================================== */}
-
-      <section className="dashboard-stats">
-
-        <div className="stat-card">
-
-          <div className="stat-icon">
-            📋
-          </div>
-
-          <div>
-            <span>Total Lists</span>
-            <strong>{totalLists}</strong>
-          </div>
-
-        </div>
-
-        <div className="stat-card">
-
-          <div className="stat-icon">
-            🛍️
-          </div>
-
-          <div>
-            <span>Total Items</span>
-            <strong>{totalItems}</strong>
-          </div>
-
-        </div>
-
-        <div className="stat-card">
-
-          <div className="stat-icon">
-            ✅
-          </div>
-
-          <div>
-            <span>Purchased</span>
-            <strong>{purchasedItems}</strong>
-          </div>
-
-        </div>
-
-        <div className="stat-card">
-
-          <div className="stat-icon">
-            ⏳
-          </div>
-
-          <div>
-            <span>Remaining</span>
-            <strong>{remainingItems}</strong>
-          </div>
-
-        </div>
-
-        <div className="stat-card">
-
-          <div className="stat-icon">
-            🔄
-          </div>
-
-          <div>
-            <span>Recurring</span>
-            <strong>{recurringLists}</strong>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ======================================
-          PROGRESS
-      ====================================== */}
-
-      <section className="progress-section">
-
-        <div className="progress-header">
-
-          <div>
-            <h3>
-              Shopping Progress
-            </h3>
-
-            <p>
-              {purchasedItems} of{" "}
-              {totalItems} items purchased
-            </p>
-          </div>
-
-          <strong>
-            {purchaseProgress}%
-          </strong>
-
-        </div>
-
-        <div className="progress-bar">
-
-          <div
-            className="progress-fill"
-            style={{
-              width: `${purchaseProgress}%`,
-            }}
-          ></div>
-
-        </div>
-
-      </section>
-
-      {/* ======================================
-          CREATE LIST
-      ====================================== */}
-
-      <section
-        id="create-list"
-        className="create-list-section"
-      >
-
-        <div className="section-heading">
-
-          <div>
-            <span>
-              ORGANIZE YOUR SHOPPING
-            </span>
-
-            <h2>
-              Create Shopping List
-            </h2>
-          </div>
-
-          <div className="section-icon">
-            📝
-          </div>
-
-        </div>
-
-        <form
-          className="create-list-form"
-          onSubmit={createList}
-        >
-
-          <div className="form-group">
-
-            <label>
-              List Name
-            </label>
-
-            <input
-              type="text"
-              placeholder="e.g. Weekly Grocery"
-              value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
-            />
-
-          </div>
-
-          <div className="form-group">
-
-            <label>
-              Description
-            </label>
-
-            <input
-              type="text"
-              placeholder="What is this list for?"
-              value={description}
-              onChange={(e) =>
-                setDescription(
-                  e.target.value
-                )
-              }
-            />
-
-          </div>
-
-          <div className="recurring-option">
-
-            <label className="toggle-label">
-
-              <input
-                type="checkbox"
-                checked={isRecurring}
-                onChange={(e) =>
-                  setIsRecurring(
-                    e.target.checked
-                  )
-                }
-              />
-
-              <span className="toggle-slider"></span>
-
-              <span>
-                Make this a recurring list
-              </span>
-
-            </label>
-
-          </div>
-
           <button
-            className="create-button"
-            type="submit"
+            onClick={() =>
+              navigate("/ai")
+            }
           >
-            Create List
+            Try AI Generator
           </button>
 
-        </form>
-
-      </section>
-
-      {/* ======================================
-          SHOPPING LISTS
-      ====================================== */}
-
-      <section className="shopping-lists-section">
-
-        <div className="lists-heading">
-
-          <div>
-            <span>
-              YOUR COLLECTION
-            </span>
-
-            <h2>
-              My Shopping Lists
-            </h2>
+          <div className="ai-basket">
+            🥬🥕🍅
           </div>
-
-          <span className="list-count">
-            {filteredLists.length} list
-            {filteredLists.length !== 1
-              ? "s"
-              : ""}
-          </span>
 
         </div>
 
-        {/* Search/filter */}
+        {/* LOGOUT */}
 
-        <div className="list-toolbar">
+        <button
+          className="sidebar-logout"
+          onClick={logout}
+        >
+          <span>↪</span>
+          Logout
+        </button>
 
-          <div className="search-box">
+      </aside>
 
-            <span>🔍</span>
+      {/* ======================================
+          MAIN
+      ====================================== */}
+
+      <main className="dashboard-main">
+
+        {/* ====================================
+            TOP BAR
+        ==================================== */}
+
+        <header className="topbar">
+
+          <div className="mobile-brand">
+
+            <div className="brand-mark">
+              🛒
+            </div>
+
+            <strong>
+              Shop<span>List</span>
+            </strong>
+
+          </div>
+
+          <div className="global-search">
+
+            <span>
+              ⌕
+            </span>
 
             <input
               type="text"
-              placeholder="Search shopping lists..."
+              placeholder="Search items or lists..."
               value={searchTerm}
               onChange={(e) =>
                 setSearchTerm(
                   e.target.value
                 )
               }
+              aria-label="Search shopping lists"
             />
 
             {searchTerm && (
               <button
                 type="button"
-                className="clear-search"
                 onClick={() =>
                   setSearchTerm("")
                 }
@@ -728,312 +548,1132 @@ function Dashboard() {
 
           </div>
 
-          <div className="filter-buttons">
+          <div className="topbar-actions">
 
             <button
-              className={
-                listFilter === "All"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setListFilter("All")
-              }
+              className="top-icon"
+              aria-label="Notifications"
             >
-              All
+              ♡
+              <i>3</i>
             </button>
 
             <button
-              className={
-                listFilter === "Recurring"
-                  ? "active"
-                  : ""
-              }
+              className="top-icon"
               onClick={() =>
-                setListFilter("Recurring")
+                navigate("/ai")
               }
+              aria-label="AI shopping list"
             >
-              🔄 Recurring
-            </button>
-
-            <button
-              className={
-                listFilter === "Regular"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setListFilter("Regular")
-              }
-            >
-              Regular
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* Lists */}
-
-        {lists.length === 0 ? (
-
-          <div className="empty-lists">
-
-            <div className="empty-icon">
               🛒
+              <i>AI</i>
+            </button>
+
+            <div className="profile-chip">
+
+              <div className="profile-avatar">
+                AZ
+              </div>
+
+              <div>
+                <strong>
+                  Anisur Zahir
+                </strong>
+
+                <span>
+                  Shopping Planner
+                </span>
+              </div>
+
+              <span className="profile-chevron">
+                ⌄
+              </span>
+
             </div>
 
-            <h3>
-              No shopping lists yet
-            </h3>
+          </div>
 
-            <p>
-              Create your first shopping
-              list to get started.
-            </p>
+        </header>
+
+        {/* ====================================
+            CONTENT
+        ==================================== */}
+
+        <section className="dashboard-content">
+
+          {/* WELCOME */}
+
+          <div className="welcome-row">
+
+            <div>
+
+              <p className="eyebrow">
+                YOUR SHOPPING OVERVIEW
+              </p>
+
+              <h1>
+                Good morning, Anisur! 👋
+              </h1>
+
+              <p className="welcome-copy">
+                Here's what's happening with
+                your shopping lists today.
+              </p>
+
+            </div>
 
             <button
-              onClick={() =>
-                document
-                  .getElementById(
-                    "create-list"
-                  )
-                  ?.scrollIntoView({
-                    behavior: "smooth",
-                  })
-              }
+              className="primary-button"
+              onClick={scrollToCreate}
             >
-              Create Your First List
+              <span>＋</span>
+              Create New List
             </button>
 
           </div>
 
-        ) : filteredLists.length === 0 ? (
+          {/* ==================================
+              STAT CARDS
+          ================================== */}
 
-          <div className="empty-lists">
+          <div className="stats-grid">
 
-            <div className="empty-icon">
-              🔎
-            </div>
+            <article className="stat-card">
 
-            <h3>
-              No matching lists
-            </h3>
+              <div className="stat-icon green">
+                ▣
+              </div>
 
-            <p>
-              Try a different search or filter.
-            </p>
+              <div>
 
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setListFilter("All");
-              }}
-            >
-              Clear Filters
-            </button>
+                <span>
+                  Total Lists
+                </span>
+
+                <strong>
+                  {totalLists}
+                </strong>
+
+                <small>
+                  All your lists
+                </small>
+
+              </div>
+
+            </article>
+
+            <article className="stat-card">
+
+              <div className="stat-icon blue">
+                ✓
+              </div>
+
+              <div>
+
+                <span>
+                  Total Items
+                </span>
+
+                <strong>
+                  {totalItems}
+                </strong>
+
+                <small>
+                  Across all lists
+                </small>
+
+              </div>
+
+            </article>
+
+            <article className="stat-card">
+
+              <div className="stat-icon orange">
+                🛒
+              </div>
+
+              <div>
+
+                <span>
+                  Purchased
+                </span>
+
+                <strong>
+                  {purchasedItems}
+                </strong>
+
+                <small>
+                  Items completed
+                </small>
+
+              </div>
+
+            </article>
+
+            <article className="stat-card">
+
+              <div className="stat-icon purple">
+                ◷
+              </div>
+
+              <div>
+
+                <span>
+                  Pending
+                </span>
+
+                <strong>
+                  {remainingItems}
+                </strong>
+
+                <small>
+                  Items to buy
+                </small>
+
+              </div>
+
+            </article>
 
           </div>
 
-        ) : (
+          {/* ==================================
+              RECENT + AI
+          ================================== */}
 
-          <div className="shopping-lists-grid">
+          <div className="dashboard-grid">
 
-            {filteredLists.map((list) => (
+            {/* RECENT LISTS */}
 
-              <article
-                key={list._id}
-                className="shopping-list-card"
-              >
+            <section className="recent-panel panel">
 
-                {editingId === list._id ? (
+              <div className="panel-heading">
 
-                  /* ==================================
-                     EDIT MODE
-                  ================================== */
+                <div>
 
-                  <div className="edit-list-form">
+                  <p className="eyebrow">
+                    YOUR COLLECTION
+                  </p>
 
-                    <div className="edit-heading">
-                      <span>
-                        EDIT LIST
-                      </span>
+                  <h2>
+                    Recent Lists
+                  </h2>
 
-                      <h3>
-                        Update Shopping List
-                      </h3>
-                    </div>
+                </div>
 
-                    <div className="form-group">
+                <button
+                  className="text-button"
+                  onClick={scrollToCreate}
+                >
+                  + Create New List
+                </button>
 
-                      <label>
-                        List Name
-                      </label>
+              </div>
 
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) =>
-                          setEditName(
-                            e.target.value
-                          )
-                        }
-                      />
+              {lists.length === 0 ? (
 
-                    </div>
+                <div className="compact-empty">
 
-                    <div className="form-group">
+                  <span>
+                    🛒
+                  </span>
 
-                      <label>
-                        Description
-                      </label>
+                  <h3>
+                    No shopping lists yet
+                  </h3>
 
-                      <input
-                        type="text"
-                        value={
-                          editDescription
-                        }
-                        onChange={(e) =>
-                          setEditDescription(
-                            e.target.value
-                          )
-                        }
-                      />
+                  <p>
+                    Create your first list
+                    to get started.
+                  </p>
 
-                    </div>
+                  <button
+                    className="primary-button"
+                    onClick={scrollToCreate}
+                  >
+                    Create Your First List
+                  </button>
 
-                    <label className="toggle-label">
+                </div>
 
-                      <input
-                        type="checkbox"
-                        checked={
-                          editRecurring
-                        }
-                        onChange={(e) =>
-                          setEditRecurring(
-                            e.target.checked
-                          )
-                        }
-                      />
+              ) : (
 
-                      <span className="toggle-slider"></span>
+                <div className="recent-list">
 
-                      <span>
-                        Recurring list
-                      </span>
+                  {lists
+                    .slice(0, 4)
+                    .map((list, index) => {
 
-                    </label>
+                      const progress =
+                        getListProgress(
+                          list._id
+                        );
 
-                    <div className="edit-list-actions">
+                      const stats =
+                        listStats[
+                          list._id
+                        ];
 
-                      <button
-                        className="save-button"
-                        onClick={() =>
-                          updateList(
-                            list._id
-                          )
-                        }
-                      >
-                        ✓ Save Changes
-                      </button>
+                      return (
+                        <button
+                          className="recent-list-row"
+                          key={list._id}
+                          onClick={() =>
+                            navigate(
+                              `/lists/${list._id}/items`
+                            )
+                          }
+                        >
 
-                      <button
-                        className="cancel-button"
-                        onClick={
-                          cancelEditing
-                        }
-                      >
-                        Cancel
-                      </button>
+                          <div
+                            className={`recent-icon icon-${
+                              index % 5
+                            }`}
+                          >
+                            {getListIcon(
+                              list,
+                              index
+                            )}
+                          </div>
 
-                    </div>
+                          <div className="recent-list-info">
 
+                            <strong>
+                              {list.name}
+                            </strong>
+
+                            <span>
+                              {stats?.total ?? 0}{" "}
+                              items
+
+                              {list.isRecurring
+                                ? " • Recurring"
+                                : ""}
+                            </span>
+
+                          </div>
+
+                          <div className="mini-progress">
+
+                            <div>
+
+                              <span>
+                                {progress}%
+                              </span>
+
+                              <div className="mini-progress-track">
+
+                                <div
+                                  style={{
+                                    width: `${progress}%`,
+                                  }}
+                                />
+
+                              </div>
+
+                            </div>
+
+                          </div>
+
+                          <span className="row-arrow">
+                            ›
+                          </span>
+
+                        </button>
+                      );
+                    })}
+
+                </div>
+              )}
+
+              {lists.length > 0 && (
+                <button
+                  className="view-all-link"
+                  onClick={scrollToLists}
+                >
+                  View all lists →
+                </button>
+              )}
+
+            </section>
+
+            {/* AI PANEL */}
+
+            <aside className="ai-panel panel">
+
+              <div className="ai-panel-glow"></div>
+
+              <div className="ai-panel-content">
+
+                <p className="eyebrow purple-text">
+                  AI ASSISTANT ✦
+                </p>
+
+                <h2>
+                  Build your list faster.
+                </h2>
+
+                <p>
+                  Generate a shopping list
+                  from your meal plan or
+                  selected recipes.
+                </p>
+
+                <button
+                  onClick={() =>
+                    navigate("/ai")
+                  }
+                >
+                  Generate Shopping List →
+                </button>
+
+              </div>
+
+              <div className="ai-illustration">
+
+                <div className="phone">
+
+                  <div className="phone-top"></div>
+
+                  <div className="check-line">
+                    ✓ Grocery items
                   </div>
 
-                ) : (
+                  <div className="check-line">
+                    ✓ Fresh vegetables
+                  </div>
 
-                  /* ==================================
-                     NORMAL MODE
-                  ================================== */
+                  <div className="check-line">
+                    ✓ Dairy & eggs
+                  </div>
 
-                  <>
+                  <div className="check-line">
+                    ✓ Snacks
+                  </div>
 
-                    <div className="list-card-top">
+                </div>
 
-                      <div className="list-card-icon">
-                        🛒
-                      </div>
+                <div className="basket-art">
+                  🛒
+                </div>
 
-                      {list.isRecurring && (
-                        <span className="recurring-badge">
-                          🔄 Recurring
-                        </span>
-                      )}
+              </div>
 
-                    </div>
+            </aside>
 
-                    <h3>
-                      {list.name}
-                    </h3>
+          </div>
 
-                    <p className="list-description">
-                      {list.description ||
-                        "No description provided."}
-                    </p>
+          {/* ==================================
+              LOWER GRID
+          ================================== */}
 
-                    <div className="list-card-divider"></div>
+          <div className="dashboard-grid lower-grid">
 
-                    <div className="list-card-actions">
+            {/* LISTS AT GLANCE */}
 
+            <section className="glance-panel panel">
+
+              <div className="panel-heading">
+
+                <div>
+
+                  <p className="eyebrow">
+                    QUICK ACCESS
+                  </p>
+
+                  <h2>
+                    Your Lists at a Glance
+                  </h2>
+
+                </div>
+
+              </div>
+
+              <div className="glance-grid">
+
+                {lists
+                  .slice(0, 3)
+                  .map((list, index) => {
+
+                    const progress =
+                      getListProgress(
+                        list._id
+                      );
+
+                    const stats =
+                      listStats[
+                        list._id
+                      ];
+
+                    return (
                       <button
-                        className="view-button"
+                        className="glance-card"
+                        key={list._id}
                         onClick={() =>
                           navigate(
                             `/lists/${list._id}/items`
                           )
                         }
                       >
-                        View Items →
+
+                        <div
+                          className={`glance-image image-${
+                            index % 3
+                          }`}
+                        >
+                          {getListIcon(
+                            list,
+                            index
+                          )}
+                        </div>
+
+                        <div className="glance-info">
+
+                          <strong>
+                            {list.name}
+                          </strong>
+
+                          <span>
+                            {stats?.total ?? 0}{" "}
+                            items
+                          </span>
+
+                          <div className="glance-progress">
+
+                            <div
+                              style={{
+                                width: `${progress}%`,
+                              }}
+                            ></div>
+
+                          </div>
+
+                          <b>
+                            {progress}%
+                          </b>
+
+                        </div>
+
                       </button>
+                    );
+                  })}
 
-                      <button
-                        className="icon-button"
-                        title="Edit list"
-                        onClick={() =>
-                          startEditing(list)
-                        }
-                      >
-                        ✏️
-                      </button>
+                <button
+                  className="create-glance"
+                  onClick={scrollToCreate}
+                >
 
-                      <button
-                        className="icon-button delete-button"
-                        title="Delete list"
-                        onClick={() =>
-                          deleteList(
-                            list._id,
-                            list.name
-                          )
-                        }
-                      >
-                        🗑️
-                      </button>
+                  <span>
+                    ＋
+                  </span>
 
-                    </div>
+                  <strong>
+                    Create New List
+                  </strong>
 
-                  </>
+                </button>
 
-                )}
+              </div>
 
-              </article>
+            </section>
 
-            ))}
+            {/* CATEGORIES */}
+
+            <section className="categories-panel panel">
+
+              <div className="panel-heading">
+
+                <div>
+
+                  <p className="eyebrow">
+                    SHOPPING CATEGORIES
+                  </p>
+
+                  <h2>
+                    Popular Categories
+                  </h2>
+
+                </div>
+
+              </div>
+
+              <div className="category-grid">
+
+                <div className="category-card">
+                  <span>🍎</span>
+
+                  <strong>
+                    Fruits &<br />
+                    Vegetables
+                  </strong>
+                </div>
+
+                <div className="category-card">
+                  <span>🥛</span>
+
+                  <strong>
+                    Dairy &<br />
+                    Eggs
+                  </strong>
+                </div>
+
+                <div className="category-card">
+                  <span>🥤</span>
+
+                  <strong>
+                    Snacks &<br />
+                    Drinks
+                  </strong>
+                </div>
+
+                <div className="category-card">
+                  <span>🏠</span>
+
+                  <strong>
+                    Household<br />
+                    Essentials
+                  </strong>
+                </div>
+
+              </div>
+
+            </section>
 
           </div>
 
-        )}
+          {/* ==================================
+              CREATE LIST
+          ================================== */}
 
-      </section>
+          <section
+            id="create-list"
+            className="create-panel panel"
+          >
+
+            <div className="create-panel-heading">
+
+              <div>
+
+                <p className="eyebrow">
+                  ORGANIZE YOUR SHOPPING
+                </p>
+
+                <h2>
+                  Create Shopping List
+                </h2>
+
+                <p>
+                  Start a fresh list for
+                  your next shopping trip.
+                </p>
+
+              </div>
+
+              <div className="create-panel-icon">
+                ＋
+              </div>
+
+            </div>
+
+            <form
+              className="create-form"
+              onSubmit={createList}
+            >
+
+              <div className="form-group">
+
+                <label htmlFor="list-name">
+                  List Name
+                </label>
+
+                <input
+                  id="list-name"
+                  type="text"
+                  placeholder="e.g. Weekly Groceries"
+                  value={name}
+                  onChange={(e) =>
+                    setName(e.target.value)
+                  }
+                />
+
+              </div>
+
+              <div className="form-group">
+
+                <label htmlFor="list-description">
+                  Description
+                </label>
+
+                <input
+                  id="list-description"
+                  type="text"
+                  placeholder="What is this list for?"
+                  value={description}
+                  onChange={(e) =>
+                    setDescription(
+                      e.target.value
+                    )
+                  }
+                />
+
+              </div>
+
+              <label className="toggle-label">
+
+                <input
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={(e) =>
+                    setIsRecurring(
+                      e.target.checked
+                    )
+                  }
+                />
+
+                <span className="toggle-ui"></span>
+
+                <span>
+                  Make this a recurring list
+                </span>
+
+              </label>
+
+              <button
+                className="primary-button create-submit"
+                type="submit"
+              >
+                Create List
+              </button>
+
+            </form>
+
+          </section>
+
+          {/* ==================================
+              ALL SHOPPING LISTS
+          ================================== */}
+
+          <section
+            id="shopping-lists"
+            className="lists-panel panel"
+          >
+
+            <div className="panel-heading lists-title-row">
+
+              <div>
+
+                <p className="eyebrow">
+                  ALL YOUR LISTS
+                </p>
+
+                <h2>
+                  My Shopping Lists
+                </h2>
+
+              </div>
+
+              <span className="list-count">
+
+                {filteredLists.length}{" "}
+
+                {filteredLists.length === 1
+                  ? "list"
+                  : "lists"}
+
+              </span>
+
+            </div>
+
+            {/* SEARCH */}
+
+            <div className="list-toolbar">
+
+              <div className="list-search">
+
+                <span>
+                  ⌕
+                </span>
+
+                <input
+                  type="text"
+                  placeholder="Search shopping lists..."
+                  value={searchTerm}
+                  onChange={(e) =>
+                    setSearchTerm(
+                      e.target.value
+                    )
+                  }
+                />
+
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSearchTerm("")
+                    }
+                  >
+                    ×
+                  </button>
+                )}
+
+              </div>
+
+              {/* FILTER */}
+
+              <div className="filter-buttons">
+
+                {[
+                  "All",
+                  "Recurring",
+                  "Regular",
+                ].map((filter) => (
+
+                  <button
+                    key={filter}
+                    className={
+                      listFilter === filter
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      setListFilter(filter)
+                    }
+                  >
+
+                    {filter === "Recurring"
+                      ? "↻ "
+                      : ""}
+
+                    {filter}
+
+                  </button>
+
+                ))}
+
+              </div>
+
+            </div>
+
+            {/* NO LISTS */}
+
+            {lists.length === 0 ? (
+
+              <div className="empty-lists">
+
+                <div className="empty-icon">
+                  🛒
+                </div>
+
+                <h3>
+                  No shopping lists yet
+                </h3>
+
+                <p>
+                  Create your first shopping
+                  list to get started.
+                </p>
+
+                <button
+                  className="primary-button"
+                  onClick={scrollToCreate}
+                >
+                  Create Your First List
+                </button>
+
+              </div>
+
+            ) : filteredLists.length === 0 ? (
+
+              <div className="empty-lists">
+
+                <div className="empty-icon">
+                  ⌕
+                </div>
+
+                <h3>
+                  No matching lists
+                </h3>
+
+                <p>
+                  Try a different search
+                  or filter.
+                </p>
+
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setListFilter("All");
+                  }}
+                >
+                  Clear Filters
+                </button>
+
+              </div>
+
+            ) : (
+
+              <div className="shopping-lists-grid">
+
+                {filteredLists.map(
+                  (list, index) => {
+
+                    const progress =
+                      getListProgress(
+                        list._id
+                      );
+
+                    const stats =
+                      listStats[
+                        list._id
+                      ];
+
+                    return (
+                      <article
+                        className="shopping-list-card"
+                        key={list._id}
+                      >
+
+                        {/* EDIT MODE */}
+
+                        {editingId === list._id ? (
+
+                          <div className="edit-list-form">
+
+                            <div className="edit-heading">
+
+                              <p className="eyebrow">
+                                EDIT LIST
+                              </p>
+
+                              <h3>
+                                Update Shopping List
+                              </h3>
+
+                            </div>
+
+                            <div className="form-group">
+
+                              <label>
+                                List Name
+                              </label>
+
+                              <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) =>
+                                  setEditName(
+                                    e.target.value
+                                  )
+                                }
+                              />
+
+                            </div>
+
+                            <div className="form-group">
+
+                              <label>
+                                Description
+                              </label>
+
+                              <input
+                                type="text"
+                                value={
+                                  editDescription
+                                }
+                                onChange={(e) =>
+                                  setEditDescription(
+                                    e.target.value
+                                  )
+                                }
+                              />
+
+                            </div>
+
+                            <label className="toggle-label">
+
+                              <input
+                                type="checkbox"
+                                checked={
+                                  editRecurring
+                                }
+                                onChange={(e) =>
+                                  setEditRecurring(
+                                    e.target.checked
+                                  )
+                                }
+                              />
+
+                              <span className="toggle-ui"></span>
+
+                              <span>
+                                Recurring list
+                              </span>
+
+                            </label>
+
+                            <div className="edit-list-actions">
+
+                              <button
+                                className="primary-button"
+                                onClick={() =>
+                                  updateList(
+                                    list._id
+                                  )
+                                }
+                              >
+                                ✓ Save Changes
+                              </button>
+
+                              <button
+                                className="secondary-button"
+                                onClick={
+                                  cancelEditing
+                                }
+                              >
+                                Cancel
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                        ) : (
+
+                          /* NORMAL MODE */
+
+                          <>
+
+                            <div className="list-card-top">
+
+                              <div
+                                className={`list-card-icon icon-${
+                                  index % 5
+                                }`}
+                              >
+                                {getListIcon(
+                                  list,
+                                  index
+                                )}
+                              </div>
+
+                              {list.isRecurring && (
+                                <span className="recurring-badge">
+                                  ↻ Recurring
+                                </span>
+                              )}
+
+                            </div>
+
+                            <h3>
+                              {list.name}
+                            </h3>
+
+                            <p className="list-description">
+
+                              {list.description ||
+                                "No description provided."}
+
+                            </p>
+
+                            {/* PROGRESS */}
+
+                            <div className="card-progress">
+
+                              <div>
+
+                                <span>
+                                  Shopping progress
+                                </span>
+
+                                <strong>
+                                  {progress}%
+                                </strong>
+
+                              </div>
+
+                              <div className="card-progress-track">
+
+                                <div
+                                  style={{
+                                    width: `${progress}%`,
+                                  }}
+                                ></div>
+
+                              </div>
+
+                              <small>
+                                {stats?.purchased ??
+                                  0}{" "}
+                                of{" "}
+                                {stats?.total ??
+                                  0}{" "}
+                                items purchased
+                              </small>
+
+                            </div>
+
+                            <div className="list-card-divider"></div>
+
+                            {/* ACTIONS */}
+
+                            <div className="list-card-actions">
+
+                              <button
+                                className="view-button"
+                                onClick={() =>
+                                  navigate(
+                                    `/lists/${list._id}/items`
+                                  )
+                                }
+                              >
+                                View Items →
+                              </button>
+
+                              <button
+                                className="icon-button"
+                                title="Edit list"
+                                onClick={() =>
+                                  startEditing(
+                                    list
+                                  )
+                                }
+                              >
+                                ✎
+                              </button>
+
+                              <button
+                                className="icon-button delete-button"
+                                title="Delete list"
+                                onClick={() =>
+                                  deleteList(
+                                    list._id,
+                                    list.name
+                                  )
+                                }
+                              >
+                                🗑
+                              </button>
+
+                            </div>
+
+                          </>
+
+                        )}
+
+                      </article>
+                    );
+                  }
+                )}
+
+              </div>
+
+            )}
+
+          </section>
+
+        </section>
+
+      </main>
 
     </div>
   );
