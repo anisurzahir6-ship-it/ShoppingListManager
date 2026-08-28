@@ -1,0 +1,849 @@
+/* ==========================================
+   MAIN DASHBOARD
+========================================== */
+
+.dashboard-page {
+  min-height: 100vh;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 35px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.dashboard-loading {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.loading-spinner {
+  width: 35px;
+  height: 35px;
+  border: 4px solid #333;
+  border-top-color: #aaa;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #333;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.brand-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  background: #24252d;
+  border: 1px solid #444;
+}
+
+.brand-section h1 {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.brand-section p {
+  margin: 7px 0 0;
+  opacity: 0.65;
+  font-size: 15px;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.dashboard-actions button {
+  padding: 11px 16px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+
+.dashboard-actions button:hover {
+  transform: translateY(-2px);
+}
+
+.primary-nav-button {
+  font-weight: bold;
+}
+
+/* ==========================================
+   WELCOME BANNER
+========================================== */
+
+.welcome-banner {
+  margin: 30px 0;
+  padding: 32px;
+  border: 1px solid #3b3c45;
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1e2028,
+      #17181e
+    );
+}
+
+.welcome-label,
+.section-heading span,
+.lists-heading span,
+.edit-heading span {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+  opacity: 0.55;
+}
+
+.welcome-banner h2 {
+  margin: 8px 0;
+  font-size: 30px;
+}
+
+.welcome-banner p {
+  margin: 0;
+  opacity: 0.65;
+  max-width: 600px;
+}
+
+.banner-button {
+  padding: 13px 20px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.banner-button:hover {
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   STATISTICS
+========================================== */
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  min-height: 105px;
+  padding: 18px;
+  border: 1px solid #363741;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #666;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+  width: 43px;
+  height: 43px;
+  min-width: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+  background: #24252d;
+  font-size: 20px;
+}
+
+.stat-card span {
+  display: block;
+  font-size: 13px;
+  opacity: 0.55;
+  margin-bottom: 5px;
+}
+
+.stat-card strong {
+  font-size: 28px;
+}
+
+/* ==========================================
+   SHOPPING PROGRESS
+========================================== */
+
+.progress-section {
+  padding: 22px;
+  border: 1px solid #363741;
+  border-radius: 14px;
+  margin-bottom: 30px;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+.progress-header h3 {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+
+.progress-header p {
+  margin: 0;
+  opacity: 0.55;
+  font-size: 13px;
+}
+
+.progress-header strong {
+  font-size: 22px;
+}
+
+.progress-bar {
+  height: 9px;
+  width: 100%;
+  background: #292a31;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: #888;
+  transition: width 0.5s ease;
+}
+
+/* ==========================================
+   CREATE LIST
+========================================== */
+
+.create-list-section {
+  padding: 28px;
+  border: 1px solid #363741;
+  border-radius: 16px;
+  margin-bottom: 38px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.section-heading h2 {
+  margin: 7px 0 0;
+  font-size: 24px;
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #24252d;
+  font-size: 22px;
+}
+
+.create-list-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #555;
+  border-radius: 8px;
+
+  font-family: inherit;
+}
+
+.recurring-option {
+  grid-column: 1 / -1;
+}
+
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.toggle-label input {
+  width: 17px;
+  height: 17px;
+}
+
+.create-button {
+  grid-column: 1 / -1;
+
+  padding: 13px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.create-button:hover {
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   SHOPPING LIST SECTION
+========================================== */
+
+.shopping-lists-section {
+  margin-top: 10px;
+}
+
+.lists-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.lists-heading h2 {
+  margin: 7px 0 0;
+  font-size: 26px;
+}
+
+.list-count {
+  padding: 7px 11px;
+  border: 1px solid #444;
+  border-radius: 20px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* ==========================================
+   SEARCH TOOLBAR
+========================================== */
+
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 500px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 0 13px;
+
+  border: 1px solid #444;
+  border-radius: 9px;
+}
+
+.search-box span {
+  opacity: 0.5;
+}
+
+.search-box input {
+  flex: 1;
+
+  padding: 12px 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+  color: inherit;
+
+  font-family: inherit;
+}
+
+.clear-search {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.filter-buttons button {
+  padding: 9px 12px;
+
+  border: 1px solid #444;
+  border-radius: 8px;
+
+  cursor: pointer;
+  font-family: inherit;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.filter-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+.filter-buttons button.active {
+  font-weight: bold;
+}
+
+/* ==========================================
+   LIST GRID
+========================================== */
+
+.shopping-lists-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(285px, 1fr));
+  gap: 18px;
+}
+
+.shopping-list-card {
+  min-height: 210px;
+
+  padding: 22px;
+
+  border: 1px solid #363741;
+  border-radius: 15px;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.shopping-list-card:hover {
+  transform: translateY(-4px);
+  border-color: #666;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.list-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.list-card-icon {
+  width: 43px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+  background: #24252d;
+}
+
+.recurring-badge {
+  padding: 6px 9px;
+
+  border: 1px solid #555;
+  border-radius: 20px;
+
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.shopping-list-card h3 {
+  margin: 18px 0 7px;
+  font-size: 21px;
+}
+
+.list-description {
+  min-height: 38px;
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  opacity: 0.6;
+}
+
+.list-card-divider {
+  height: 1px;
+  background: #333;
+  margin: 18px 0;
+}
+
+.list-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-button {
+  flex: 1;
+
+  padding: 10px 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  font-family: inherit;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.view-button:hover {
+  transform: translateX(2px);
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+
+  border: 1px solid #444;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-button:hover {
+  opacity: 0.7;
+}
+
+/* ==========================================
+   EDIT LIST
+========================================== */
+
+.edit-list-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.edit-heading h3 {
+  margin: 6px 0 5px;
+}
+
+.edit-list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save-button,
+.cancel-button {
+  flex: 1;
+  padding: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.cancel-button {
+  border: 1px solid #444;
+}
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.empty-lists {
+  padding: 55px 25px;
+
+  text-align: center;
+
+  border: 1px dashed #444;
+  border-radius: 15px;
+}
+
+.empty-icon {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.empty-lists h3 {
+  margin: 10px 0;
+  font-size: 21px;
+}
+
+.empty-lists p {
+  opacity: 0.55;
+  margin-bottom: 20px;
+}
+
+.empty-lists button {
+  padding: 11px 17px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 900px) {
+  .dashboard-stats {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-actions {
+    justify-content: flex-start;
+  }
+
+  .list-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 700px) {
+  .dashboard-page {
+    padding: 20px;
+  }
+
+  .brand-section {
+    align-items: flex-start;
+  }
+
+  .brand-section h1 {
+    font-size: 31px;
+  }
+
+  .welcome-banner {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 25px;
+  }
+
+  .welcome-banner h2 {
+    font-size: 25px;
+  }
+
+  .dashboard-stats {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .create-list-form {
+    grid-template-columns: 1fr;
+  }
+
+  .recurring-option,
+  .create-button {
+    grid-column: auto;
+  }
+
+  .filter-buttons {
+    width: 100%;
+  }
+
+  .filter-buttons button {
+    flex: 1;
+  }
+
+  .shopping-lists-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 450px) {
+  .dashboard-page {
+    padding: 15px;
+  }
+
+  .brand-section h1 {
+    font-size: 27px;
+  }
+
+  .brand-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+  }
+
+  .dashboard-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .dashboard-actions button {
+    width: 100%;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    min-height: 85px;
+  }
+
+  .welcome-banner {
+    margin-top: 20px;
+  }
+
+  .banner-button {
+    width: 100%;
+  }
+
+  .create-list-section {
+    padding: 20px;
+  }
+
+  .lists-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-buttons button {
+    width: 100%;
+  }
+
+  .list-card-actions {
+    flex-wrap: wrap;
+  }
+
+  .view-button {
+    flex-basis: 100%;
+  }
+}

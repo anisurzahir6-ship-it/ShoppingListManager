@@ -1,0 +1,405 @@
+/* =========================================
+   AI SHOPPING PAGE
+========================================= */
+
+.ai-shopping-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 35px 30px 60px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 10px 0 28px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #333;
+}
+
+.ai-header > div {
+  flex: 1;
+}
+
+.ai-header h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.ai-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.55;
+  font-weight: 600;
+}
+
+.ai-subtitle {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.65;
+}
+
+.ai-back-button {
+  flex-shrink: 0;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+
+/* =========================================
+   COMMON SECTION
+========================================= */
+
+.ai-input-section,
+.ai-results-section {
+  margin-bottom: 32px;
+}
+
+.ai-input-section {
+  padding: 28px;
+  border: 1px solid #3a3a42;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.ai-section-heading {
+  margin-bottom: 20px;
+}
+
+.ai-section-heading h2,
+.ai-results-section h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.ai-section-description {
+  margin: 8px 0 0;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+
+/* =========================================
+   MEAL PLAN
+========================================= */
+
+.meal-plan-input {
+  width: 100%;
+  min-height: 150px;
+  padding: 15px;
+  box-sizing: border-box;
+  resize: vertical;
+
+  border: 1px solid #777;
+  border-radius: 9px;
+
+  background: #3b3b3b;
+  color: white;
+
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.meal-plan-input:focus {
+  outline: none;
+  border-color: #aaa;
+}
+
+.ai-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.ai-generate-button,
+.ai-save-button,
+.ai-add-single-button,
+.ai-remove-button,
+.ai-clear-button {
+  padding: 11px 17px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.ai-generate-button {
+  min-width: 190px;
+}
+
+.ai-clear-button {
+  opacity: 0.75;
+}
+
+.ai-generate-button:disabled,
+.ai-save-button:disabled,
+.ai-add-single-button:disabled,
+.ai-remove-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   RESULTS HEADER
+========================================= */
+
+.ai-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.ai-item-count {
+  padding: 7px 12px;
+  border: 1px solid #444;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+
+/* =========================================
+   EMPTY / LOADING STATE
+========================================= */
+
+.ai-empty {
+  padding: 40px 25px;
+  border: 1px dashed #555;
+  border-radius: 12px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.ai-empty-icon,
+.ai-loading-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.ai-empty h3 {
+  margin: 8px 0;
+  font-size: 19px;
+}
+
+.ai-empty p {
+  margin: 5px 0;
+  opacity: 0.7;
+}
+
+
+/* =========================================
+   GENERATED ITEMS
+========================================= */
+
+.ai-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.ai-item-card {
+  padding: 20px;
+  border: 1px solid #3a3a42;
+  border-radius: 12px;
+  background: #18191f;
+}
+
+.ai-item-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ai-item-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.ai-item-number {
+  font-size: 12px;
+  opacity: 0.45;
+}
+
+
+/* =========================================
+   FORM CONTROLS
+========================================= */
+
+.ai-item-card label,
+.ai-save-section label {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.ai-item-card input,
+.ai-item-card select,
+.ai-list-select {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid #666;
+  border-radius: 7px;
+
+  background: #3b3b3b;
+  color: white;
+
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.ai-item-card input:focus,
+.ai-item-card select:focus,
+.ai-list-select:focus {
+  outline: none;
+  border-color: #aaa;
+}
+
+
+/* =========================================
+   ITEM ACTIONS
+========================================= */
+
+.ai-item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.ai-add-single-button {
+  flex: 1;
+}
+
+.ai-remove-button {
+  opacity: 0.75;
+}
+
+
+/* =========================================
+   SAVE TO SHOPPING LIST
+========================================= */
+
+.ai-save-section {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.ai-save-section label {
+  grid-column: 1 / -1;
+  margin-bottom: -5px;
+}
+
+.ai-list-select {
+  min-height: 43px;
+}
+
+.ai-save-button {
+  min-height: 43px;
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+
+  .ai-shopping-page {
+    padding: 25px 18px 50px;
+  }
+
+  .ai-header {
+    align-items: flex-start;
+  }
+
+  .ai-header h1 {
+    font-size: 34px;
+  }
+
+  .ai-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .ai-header {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .ai-header h1 {
+    font-size: 30px;
+  }
+
+  .ai-back-button {
+    width: 100%;
+  }
+
+  .ai-input-section {
+    padding: 20px;
+  }
+
+  .ai-section-heading h2,
+  .ai-results-section h2 {
+    font-size: 23px;
+  }
+
+  .ai-form-actions {
+    flex-direction: column;
+  }
+
+  .ai-generate-button,
+  .ai-clear-button {
+    width: 100%;
+  }
+
+  .ai-save-section {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-save-button {
+    width: 100%;
+  }
+
+  .ai-item-actions {
+    flex-direction: column;
+  }
+
+  .ai-add-single-button,
+  .ai-remove-button {
+    width: 100%;
+  }
+
+}
